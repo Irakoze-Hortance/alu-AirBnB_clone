@@ -3,7 +3,12 @@
     Define 'FileStorage' class
 """
 from models.base_model import BaseModel
+from models.user import User
+from models.state import State
 from models.city import City
+from models.place import Place
+from models.amenity import Amenity
+from models.review import Review
 import os.path
 import json
 
@@ -49,18 +54,10 @@ class FileStorage:
         """
         try:
             with open(FileStorage.__file_path) as f:
-                file_content = f.read().strip()
-                if file_content:  # Check if the file is not empty
-                    objdict = json.loads(file_content)
-                    for o in objdict.values():
-                        cls_name = o["__class__"]
-                        del o["__class__"]
-                        self.new(eval(cls_name)(**o))
-                else:
-                    print(f"Warning: {FileStorage.__file_path} is empty")
+                objdict = json.load(f)
+                for o in objdict.values():
+                    cls_name = o["__class__"]
+                    del o["__class__"]
+                    self.new(eval(cls_name)(**o))
         except FileNotFoundError:
-            print(f"Warning: {FileStorage.__file_path} not found")
-        except json.JSONDecodeError as e:
-            print(f"Error decoding JSON in {FileStorage.__file_path}: {e}")
-        except Exception as e:
-            print(f"Unexpected error while reloading data: {e}")
+            return
